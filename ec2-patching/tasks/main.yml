@@ -1,0 +1,19 @@
+---
+# tasks file for ec2-patching
+- name: update and upgrade apt package
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
+- name: check if reboot is require
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+    get_md5: no
+  register: reboot_require_file
+- debug:
+    var: reboot_require_file
+- name: reoot machine 
+  ansible.builtin.reboot:
+  when: reboot_require_file.stat.exists == true 
+
